@@ -1,28 +1,20 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
+name: Build Cling
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "master" ]
-permissions:
-  contents: read
-  packages: read
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣  Checkout your repository
       - uses: actions/checkout@v4
 
+      # 2️⃣  Set up Java 8 (correct toolchain for legacy Maven builds)
       - name: Set up JDK 8
         uses: actions/setup-java@v4
         with:
@@ -30,11 +22,26 @@ jobs:
           java-version: 8
           cache: maven
 
+      # 3️⃣  Build and install Seamless dependencies locally (~/.m2/repository/org/seamless)
       - name: Build Seamless dependency
         run: |
           git clone https://github.com/4thline/seamless.git
           cd seamless
           mvn clean install -DskipTests
 
+      # 4️⃣  Build Cling core & support (skip Android demo modules + Javadocs)
       - name: Build Cling
-        run: mvn -B -U -DskipTests -Dmaven.javadoc.skip=true clean package
+        run: |
+          mvn -B -U clean package \
+              -DskipTests \
+              -Dmaven.javadoc.skip=true \
+              -pl '!cling-demo-android,!cling-demo-android-browser,!cling-demo-android-light'
+
+      # 5️⃣  Save artifacts (optional)
+      - name: Upload Cling JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: cling-artifacts
+          path: |
+            core/target/*.jar
+            support/target/*.jar
