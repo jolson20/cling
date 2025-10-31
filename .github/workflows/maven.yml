@@ -29,12 +29,14 @@ jobs:
           java-version: '11'
           cache: maven
 
-      - name: Clear negative Maven cache
+      - name: Clear negative Maven cache (if present)
         run: |
-          # remove cached "not found/unauthorized" markers
-          rm -rf ~/.m2/repository/org/seamless
-          find ~/.m2/repository -name "*.lastUpdated" -delete
-          
+          REPO="$HOME/.m2/repository"
+          if [ -d "$REPO" ]; then
+            rm -rf "$REPO/org/seamless"
+            find "$REPO" -name "*.lastUpdated" -delete
+          fi
+                
       - name: Configure Maven (mirror -> GH Packages + Central) with auth
         run: |
           mkdir -p ~/.m2
