@@ -210,18 +210,7 @@
                         </executions>
                       </plugin>
 
-                <!-- Manual generation settings -->
-                <plugin>
-                    <groupId>org.fourthline.lemma</groupId>
-                    <artifactId>lemma-maven-plugin</artifactId>
-                    <version>${lemma.version}</version>
-                    <configuration>
-                        <!-- Generate unique identifiers for all citations
-                        TODO: Docs cleanup necessary for this
-                        <processXRefs>false</processXRefs>
-                        -->
-                    </configuration>
-                </plugin>
+         
 
                 <!-- Fixing the versions so Maven stops looking for the latest online... -->
                 <plugin>
@@ -262,7 +251,30 @@
         </extensions>
 
     </build>
-
+<profiles>
+  <profile>
+    <id>docs</id>
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.fourthline.lemma</groupId>
+            <artifactId>lemma-maven-plugin</artifactId>
+            <version>1.1.1</version>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.fourthline.lemma</groupId>
+          <artifactId>lemma-maven-plugin</artifactId>
+          <version>1.1.1</version>
+          <!-- whatever config/executions it had -->
+        </plugin>
+      </plugins>
+    </build>
+  </profile>
+</profiles>
     <!-- ##################################################################################################### -->
 
     <reporting>
