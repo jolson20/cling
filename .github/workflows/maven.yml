@@ -32,12 +32,10 @@ jobs:
       - name: Build Cling
         run: |
           mvn -B -U -DskipTests -Dmaven.javadoc.skip=true \
-              -am -pl cling-core,cling-support clean package
-
+              -am -pl core clean package
       - name: Upload Cling JARs
         uses: actions/upload-artifact@v4
         with:
           name: cling-artifacts
           path: |
-            core/target/*.jar
-            support/target/*.jar
+            ./*.jar
