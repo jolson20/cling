@@ -23,76 +23,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
-          # temporarily disable Maven cache while debugging 401/lastUpdated issues
-          # cache: maven
+          java-version: 8
+          cache: maven
+
       - name: Build Seamless dependency
         run: |
           git clone https://github.com/4thline/seamless.git
           cd seamless
-          mvn clean install -DskipTests -Dmaven.compiler.source=1.7 -Dmaven.compiler.target=1.7
-      - name: Write Maven settings (mirror + auth)
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<'XML'
-          <settings>
-            <servers>
-              <server>
-                <id>gh-mirror</id>
-                <username>${env.GITHUB_ACTOR}</username>
-                <password>${env.GITHUB_TOKEN}</password>
-              </server>
-            </servers>
-            <mirrors>
-              <mirror>
-                <id>gh-mirror</id>
-                <url>https://maven.pkg.github.com/jolson20/cling</url>
-                <mirrorOf>external:*,!central</mirrorOf>
-              </mirror>
-            </mirrors>
-            <profiles>
-              <profile>
-                <id>repos</id>
-                <repositories>
-                  <repository>
-                    <id>gh-mirror</id>
-                    <url>https://maven.pkg.github.com/jolson20/cling</url>
-                    <releases><enabled>true</enabled><updatePolicy>always</updatePolicy></releases>
-                    <snapshots><enabled>false</enabled></snapshots>
-                  </repository>
-                  <repository>
-                    <id>central</id>
-                    <url>https://repo.maven.apache.org/maven2</url>
-                  </repository>
-                </repositories>
-              </profile>
-            </profiles>
-            <activeProfiles>
-              <activeProfile>repos</activeProfile>
-            </activeProfiles>
-          </settings>
-          XML
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+          mvn clean install -DskipTests
 
-      # optional sanity check that the package is reachable with your creds
-      - name: Probe GH Packages auth
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        run: |
-          curl -sSIL -u "$GITHUB_ACTOR:$GITHUB_TOKEN" \
-            https://maven.pkg.github.com/jolson20/cling/org/seamless/seamless-util/1.1.2/seamless-util-1.1.2.pom
-
-      - name: Build with a FRESH local repo (no old lastUpdated files)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        run: |
-          FRESH_REPO="$RUNNER_TEMP/m2repo_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
-          echo "Using fresh repo: $FRESH_REPO"
-          mvn -B -U -DskipTests -Dmaven.repo.local="$FRESH_REPO" clean package
+      - name: Build Cling
+        run: mvn -B -U -DskipTests clean package
