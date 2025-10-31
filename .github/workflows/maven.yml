@@ -33,9 +33,9 @@ jobs:
         run: |
           mvn -B -U -DskipTests -Dmaven.javadoc.skip=true \
               -am -pl core clean package
-      - name: Upload Cling JARs
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: cling-artifacts
+          name: cling-jars
           path: |
-            core/target/*.jar
+            core/target/cling-core-2.1.2.jar
