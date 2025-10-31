@@ -21,7 +21,7 @@ jobs:
       - name: Build dependencies (skip docs/tests)
         working-directory: ./cling   # adjust if your root pom.xml is elsewhere
         run: |
-          mvn -B -U -DskipTests -Dmaven.javadoc.skip=true -am -pl core,support clean install
+          mvn -B -U -DskipTests -Dmaven.javadoc.skip=true -am -pl core clean install
 
       - name: Run single test
         working-directory: ./cling
