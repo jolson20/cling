@@ -31,10 +31,8 @@ jobs:
 
       - name: Build Cling
         run: |
-          mvn -B -U clean package \
-              -DskipTests \
-              -Dmaven.javadoc.skip=true \
-              -pl '!cling-demo-android,!cling-demo-android-browser,!cling-demo-android-light'
+          mvn -B -U -DskipTests -Dmaven.javadoc.skip=true \
+              -am -pl cling-core,cling-support clean package
 
       - name: Upload Cling JARs
         uses: actions/upload-artifact@v4
