@@ -1,10 +1,10 @@
-name: Run Test without Nondex
+name: Run Single Cling Test
 
 on:
-  workflow_dispatch:  # run manually
+  workflow_dispatch:  # manually trigger from Actions tab
 
 jobs:
-  single-test:
+  run-single-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,19 +18,14 @@ jobs:
           java-version: 8
           cache: maven
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: cling-artifacts
-          path: ./cling/target-artifacts
-
-      - name: Verify downloaded jars
+      - name: Build dependencies (skip docs/tests)
+        working-directory: ./cling   # adjust if your root pom.xml is elsewhere
         run: |
-          echo "Downloaded JARs:"
-          ls -lh ./cling/target-artifacts
+          mvn -B -U -DskipTests -Dmaven.javadoc.skip=true -am -pl core,support clean install
 
       - name: Run single test
+        working-directory: ./cling
         run: |
           mvn -B -pl core \
             -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering \
-            -Dmaven.javadoc.skip=true test
+            test
