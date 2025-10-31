@@ -26,54 +26,54 @@ jobs:
           java-version: '11'
           cache: maven
       - name: Configure Maven (mirror -> GH Packages + Central) with auth
-  run: |
-    mkdir -p ~/.m2
-    cat > ~/.m2/settings.xml <<'XML'
-    <settings>
-      <servers>
-        <!-- Must match the id used below (gh-mirror) -->
-        <server>
-          <id>gh-mirror</id>
-          <username>${env.GITHUB_ACTOR}</username>
-          <password>${env.GITHUB_TOKEN}</password>
-        </server>
-      </servers>
-
-      <!-- Redirect any external repo (e.g., 4thline) to GH Packages; keep Central direct -->
-      <mirrors>
-        <mirror>
-          <id>gh-mirror</id>
-          <name>Mirror external repos to GH Packages</name>
-          <url>https://maven.pkg.github.com/jolson20/cling</url>
-          <mirrorOf>external:*,!central</mirrorOf>
-        </mirror>
-      </mirrors>
-
-      <profiles>
-        <profile>
-          <id>repos</id>
-          <repositories>
-            <repository>
-              <id>gh-mirror</id>
-              <url>https://maven.pkg.github.com/jolson20/cling</url>
-              <releases><enabled>true</enabled></releases>
-              <snapshots><enabled>false</enabled></snapshots>
-            </repository>
-            <repository>
-              <id>central</id>
-              <url>https://repo.maven.apache.org/maven2</url>
-            </repository>
-          </repositories>
-        </profile>
-      </profiles>
-
-      <activeProfiles>
-        <activeProfile>repos</activeProfile>
-      </activeProfiles>
-    </settings>
-    XML
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'XML'
+          <settings>
+            <servers>
+              <!-- Must match the id used below (gh-mirror) -->
+              <server>
+                <id>gh-mirror</id>
+                <username>${env.GITHUB_ACTOR}</username>
+                <password>${env.GITHUB_TOKEN}</password>
+              </server>
+            </servers>
+      
+            <!-- Redirect any external repo (e.g., 4thline) to GH Packages; keep Central direct -->
+            <mirrors>
+              <mirror>
+                <id>gh-mirror</id>
+                <name>Mirror external repos to GH Packages</name>
+                <url>https://maven.pkg.github.com/jolson20/cling</url>
+                <mirrorOf>external:*,!central</mirrorOf>
+              </mirror>
+            </mirrors>
+      
+            <profiles>
+              <profile>
+                <id>repos</id>
+                <repositories>
+                  <repository>
+                    <id>gh-mirror</id>
+                    <url>https://maven.pkg.github.com/jolson20/cling</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                  </repository>
+                  <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                  </repository>
+                </repositories>
+              </profile>
+            </profiles>
+      
+            <activeProfiles>
+              <activeProfile>repos</activeProfile>
+            </activeProfiles>
+          </settings>
+          XML
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     
       - name: Build project
