@@ -16,7 +16,7 @@ on:
 permissions:
   contents: read
   packages: read
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,45 +27,28 @@ jobs:
         with:
           distribution: temurin
           java-version: '11'
-          cache: maven
-      - name: Print Maven localRepository
-        run: |
-          MAVEN_LOCAL=$(mvn -B -q help:evaluate -Dexpression=settings.localRepository -DforceStdout)
-          echo "LOCAL_REPO=$MAVEN_LOCAL" | tee -a $GITHUB_ENV
-          echo "Maven localRepository = $MAVEN_LOCAL"
-      - name: Clear negative Maven cache (if present)
-        run: |
-          REPO="$HOME/.m2/repository"
-          if [ -d "$REPO" ]; then
-            rm -rf "$REPO/org/seamless"
-            find "$REPO" -name "*.lastUpdated" -delete
-          fi
-          ls -a $HOME/.m2/
-                
-      - name: Configure Maven (mirror -> GH Packages + Central) with auth
+          # temporarily disable Maven cache while debugging 401/lastUpdated issues
+          # cache: maven
+
+      - name: Write Maven settings (mirror + auth)
         run: |
           mkdir -p ~/.m2
           cat > ~/.m2/settings.xml <<'XML'
           <settings>
             <servers>
-              <!-- Must match the id used below (gh-mirror) -->
               <server>
                 <id>gh-mirror</id>
                 <username>${env.GITHUB_ACTOR}</username>
                 <password>${env.GITHUB_TOKEN}</password>
               </server>
             </servers>
-      
-            <!-- Redirect any external repo (e.g., 4thline) to GH Packages; keep Central direct -->
             <mirrors>
               <mirror>
                 <id>gh-mirror</id>
-                <name>Mirror external repos to GH Packages</name>
                 <url>https://maven.pkg.github.com/jolson20/cling</url>
                 <mirrorOf>external:*,!central</mirrorOf>
               </mirror>
             </mirrors>
-      
             <profiles>
               <profile>
                 <id>repos</id>
@@ -73,7 +56,7 @@ jobs:
                   <repository>
                     <id>gh-mirror</id>
                     <url>https://maven.pkg.github.com/jolson20/cling</url>
-                    <releases><enabled>true</enabled></releases>
+                    <releases><enabled>true</enabled><updatePolicy>always</updatePolicy></releases>
                     <snapshots><enabled>false</enabled></snapshots>
                   </repository>
                   <repository>
@@ -83,7 +66,6 @@ jobs:
                 </repositories>
               </profile>
             </profiles>
-      
             <activeProfiles>
               <activeProfile>repos</activeProfile>
             </activeProfiles>
@@ -91,7 +73,22 @@ jobs:
           XML
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
 
-    
-      - name: Build project
-        run: mvn -B -U -DskipTests clean package
+      # optional sanity check that the package is reachable with your creds
+      - name: Probe GH Packages auth
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          curl -sSIL -u "$GITHUB_ACTOR:$GITHUB_TOKEN" \
+            https://maven.pkg.github.com/jolson20/cling/org/seamless/seamless-util/1.1.2/seamless-util-1.1.2.pom
+
+      - name: Build with a FRESH local repo (no old lastUpdated files)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          FRESH_REPO="$RUNNER_TEMP/m2repo_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
+          echo "Using fresh repo: $FRESH_REPO"
+          mvn -B -U -DskipTests -Dmaven.repo.local="$FRESH_REPO" clean package
