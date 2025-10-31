@@ -25,27 +25,45 @@ jobs:
           distribution: temurin
           java-version: '11'
           cache: maven
-
-      # Prefetch Seamless deps with retries (only needed first time)
-      - name: Prefetch Seamless artifacts
+      - name: Configure Maven to use GH Packages + Central and mirror everything else
         run: |
-          set -e
-          for A in org.seamless:seamless-util:1.1.2 \
-                   org.seamless:seamless-http:1.1.2 \
-                   org.seamless:seamless-xml:1.1.2
-          do
-            n=0
-            until [ $n -ge 6 ]
-            do
-              mvn -B -U dependency:get \
-                -Dartifact="$A" \
-                -DrepoUrl=https://4thline.org/m2 \
-                -Dmaven.wagon.http.retryHandler.count=5 && break
-              n=$((n+1))
-              sleep $((5*n))   # backoff
-            done
-          done
-
-      # Build using what’s cached; -o = offline (won’t hit 4thline)
-      - name: Build (offline if repo is flaky)
-        run: mvn -B -o -DskipTests clean package
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'XML'
+          <settings>
+            <!-- Route ANY external repo (4thline, etc) to GH Packages; leave Central alone -->
+            <mirrors>
+              <mirror>
+                <id>gh-mirror</id>
+                <name>Mirror external repos to GH Packages</name>
+                <url>https://maven.pkg.github.com/jolson20/cling</url>
+                <mirrorOf>external:*,!central</mirrorOf>
+              </mirror>
+            </mirrors>
+      
+            <profiles>
+              <profile>
+                <id>repos</id>
+                <repositories>
+                  <!-- Your mirror repo -->
+                  <repository>
+                    <id>gh-mirror</id>
+                    <url>https://maven.pkg.github.com/jolson20/cling</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>false</enabled></snapshots>
+                  </repository>
+                  <!-- Maven Central (kept separate, not mirrored) -->
+                  <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                  </repository>
+                </repositories>
+              </profile>
+            </profiles>
+      
+            <activeProfiles>
+              <activeProfile>repos</activeProfile>
+            </activeProfiles>
+          </settings>
+          XML
+      - name: Build project
+        run: mvn -B -U -DskipTests clean package
