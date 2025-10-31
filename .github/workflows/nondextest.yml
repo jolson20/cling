@@ -19,12 +19,10 @@ jobs:
           cache: maven
 
       - name: Build dependencies (skip docs/tests)
-        working-directory: ./cling   # adjust if needed
         run: |
           mvn -B -U -DskipTests -Dmaven.javadoc.skip=true -am -pl core clean install
 
       - name: Run NonDex randomized test
-        working-directory: ./cling
         run: |
           mvn -B -pl core \
             edu.illinois:nondex-maven-plugin:2.1.1:nondex \
