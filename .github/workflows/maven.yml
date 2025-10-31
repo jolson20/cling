@@ -38,4 +38,4 @@ jobs:
         with:
           name: cling-artifacts
           path: |
-            ./*.jar
+            core/target/*.jar
