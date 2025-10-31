@@ -108,7 +108,8 @@
     <repositories>
         <repository>
             <id>4thline-repo</id>
-            <url>http://4thline.org/m2</url>
+            <url>https://4thline.org/m2</url>
+            <releases><enabled>true</enabled></releases>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -118,17 +119,14 @@
     <pluginRepositories>
         <pluginRepository>
             <id>4thline-repo</id>
-            <url>http://4thline.org/m2</url>
+            <url>https://4thline.org/m2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+             <id>onejar-maven-plugin.googlecode.com</id>
+             <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -208,12 +206,28 @@
                     </dependencies>
                 </plugin>
 
-                <!-- One-JAR executable -->
-                <plugin>
-                    <groupId>com.jolira</groupId>
-                    <artifactId>onejar-maven-plugin</artifactId>
-                    <version>1.4.4</version>
-                </plugin>
+                <!-- Maven Shade -->
+                  <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.5.3</version>
+                        <executions>
+                          <execution>
+                            <phase>package</phase>
+                            <goals>
+                              <goal>shade</goal>
+                            </goals>
+                            <configuration>
+                              <createDependencyReducedPom>false</createDependencyReducedPom>
+                              <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                  <mainClass>your.main.ClassName</mainClass>
+                                </transformer>
+                              </transformers>
+                            </configuration>
+                          </execution>
+                        </executions>
+                      </plugin>
 
                 <!-- Manual generation settings -->
                 <plugin>
