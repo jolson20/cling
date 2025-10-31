@@ -22,15 +22,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: cling-jars
-          path: ./cling/target-artifacts
+          path: core/target
 
       - name: Verify downloaded jars
         run: |
           echo "Downloaded JARs:"
-          ls -lh ./cling/target-artifacts
+          ls -lh core/target
 
       - name: Run single test
-        working-directory: ./cling
         run: |
           mvn -B -pl core \
             -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering \
