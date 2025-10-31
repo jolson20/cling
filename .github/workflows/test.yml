@@ -19,12 +19,10 @@ jobs:
           cache: maven
 
       - name: Build dependencies (skip docs/tests)
-        working-directory: ./cling   # adjust if your root pom.xml is elsewhere
         run: |
           mvn -B -U -DskipTests -Dmaven.javadoc.skip=true -am -pl core clean install
 
       - name: Run single test
-        working-directory: ./cling
         run: |
           mvn -B -pl core \
             -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering \
