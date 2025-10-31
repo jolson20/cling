@@ -106,14 +106,16 @@
     <!-- ##################################################################################################### -->
 
     <repositories>
-        <repository>
-            <id>4thline-repo</id>
-            <url>https://4thline.org/m2</url>
-            <releases><enabled>true</enabled></releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+           <repository>
+             <id>caprica-mvn</id>
+             <url>https://raw.githubusercontent.com/caprica/mvn-repo/master/</url>
+             <releases><enabled>true</enabled></releases>
+             <snapshots><enabled>false</enabled></snapshots>
+           </repository>
+           <repository>
+             <id>central</id>
+             <url>https://repo.maven.apache.org/maven2</url>
+           </repository>
     </repositories>
 
     <pluginRepositories>
