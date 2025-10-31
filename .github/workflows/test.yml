@@ -21,13 +21,13 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: cling-jars
-          path: core/target
+          name: cling-artifacts
+          path: ./cling/target-artifacts
 
       - name: Verify downloaded jars
         run: |
           echo "Downloaded JARs:"
-          ls -lh core/target
+          ls -lh ./cling/target-artifacts
 
       - name: Run single test
         run: |
