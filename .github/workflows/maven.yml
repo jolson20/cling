@@ -28,7 +28,11 @@ jobs:
           distribution: temurin
           java-version: '11'
           cache: maven
-
+      - name: Print Maven localRepository
+        run: |
+          MAVEN_LOCAL=$(mvn -B -q help:evaluate -Dexpression=settings.localRepository -DforceStdout)
+          echo "LOCAL_REPO=$MAVEN_LOCAL" | tee -a $GITHUB_ENV
+          echo "Maven localRepository = $MAVEN_LOCAL"
       - name: Clear negative Maven cache (if present)
         run: |
           REPO="$HOME/.m2/repository"
