@@ -21,14 +21,14 @@ jobs:
       - name: Build dependencies (skip docs/tests)
         run: |
           mvn -B -U -DskipTests -Dmaven.javadoc.skip=true -am -pl core clean install
-
-      - name: Run NonDex randomized test
-        run: |
-          mvn -B -pl core \
-            edu.illinois:nondex-maven-plugin:2.1.1:nondex \
-            -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering -DnondexRuns=25
       - name: Run test without NonDex
         run: |
           mvn -B -pl core \
             -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering \
             test
+      - name: Run NonDex randomized test
+        run: |
+          mvn -B -pl core \
+            edu.illinois:nondex-maven-plugin:2.1.1:nondex \
+            -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering -DnondexRuns=25
+
