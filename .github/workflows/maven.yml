@@ -36,7 +36,7 @@ jobs:
             rm -rf "$REPO/org/seamless"
             find "$REPO" -name "*.lastUpdated" -delete
           fi
-          ls $HOME/
+          ls -a $HOME/
                 
       - name: Configure Maven (mirror -> GH Packages + Central) with auth
         run: |
