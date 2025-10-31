@@ -26,4 +26,4 @@ jobs:
         run: |
           mvn -B -pl core \
             edu.illinois:nondex-maven-plugin:2.1.1:nondex \
-            -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering
+            -Dtest=org.fourthline.cling.test.gena.EventXMLProcessingTest#writeReadRequestRecovering -DnondexRuns=25
