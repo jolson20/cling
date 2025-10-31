@@ -29,7 +29,11 @@ jobs:
           java-version: '11'
           # temporarily disable Maven cache while debugging 401/lastUpdated issues
           # cache: maven
-
+      - name: Build Seamless dependency
+        run: |
+          git clone https://github.com/4thline/seamless.git
+          cd seamless
+          mvn clean install -DskipTests
       - name: Write Maven settings (mirror + auth)
         run: |
           mkdir -p ~/.m2
