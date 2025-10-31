@@ -28,6 +28,13 @@ jobs:
           distribution: temurin
           java-version: '11'
           cache: maven
+
+      - name: Clear negative Maven cache
+        run: |
+          # remove cached "not found/unauthorized" markers
+          rm -rf ~/.m2/repository/org/seamless
+          find ~/.m2/repository -name "*.lastUpdated" -delete
+          
       - name: Configure Maven (mirror -> GH Packages + Central) with auth
         run: |
           mkdir -p ~/.m2
