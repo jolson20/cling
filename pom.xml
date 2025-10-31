@@ -108,7 +108,7 @@
     <repositories>
         <repository>
             <id>4thline-repo</id>
-            <url>http://4thline.org/m2</url>
+            <url>https://4thline.org/m2</url>
             <releases><enabled>true</enabled></releases>
             <snapshots>
                 <enabled>false</enabled>
@@ -117,17 +117,6 @@
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>4thline-repo</id>
-            <url>http://4thline.org/m2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-             <id>onejar-maven-plugin.googlecode.com</id>
-             <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
     </pluginRepositories>
 
     <!-- ##################################################################################################### -->
